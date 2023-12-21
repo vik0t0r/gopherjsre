@@ -1,13 +1,8 @@
 let fs = require("fs");
 let path = require('path');
 const vscode = require('vscode');
-const { deleteFolderRecursive } = require("./extension");
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
-/**
- * @param {vscode.ExtensionContext} context
- */
+
 
 
 function splitFiles(){
@@ -26,12 +21,12 @@ function splitFiles(){
 	// write each line to a file
 	for (var line in text) {
 
-		lineString = text[line];
-		initNameIndex = lineString.indexOf('"') + 1;
-		lastNameIndex = lineString.indexOf('"', initNameIndex);
+		let lineString = text[line];
+		let initNameIndex = lineString.indexOf('"') + 1;
+		let lastNameIndex = lineString.indexOf('"', initNameIndex);
 
 		// genereate path
-		filePath = lineString.slice(initNameIndex, lastNameIndex);
+		let filePath = lineString.slice(initNameIndex, lastNameIndex);
 		filePath = filePath.replaceAll("/", "_");
 		filePath = filePath + ".js";
 		filePath = outputDir + filePath;
@@ -51,7 +46,7 @@ function splitFiles(){
 
 
 // rename symbols such as:    A = $packages["fmt"];
-function renamePackagesSymbols() {
+function renamePackagesSymbols(editor) {
 			// Get the entire document's text
 			const documentText = editor.document.getText();
 
@@ -94,4 +89,27 @@ function renamePackagesSymbols() {
 
 
 
+function deleteFolderRecursive(folderPath) {
+	if (fs.existsSync(folderPath)) {
+		fs.readdirSync(folderPath).forEach((file) => {
+			const curPath = path.join(folderPath, file);
+
+			if (fs.lstatSync(curPath).isDirectory()) {
+				// Recursive call for directories
+				deleteFolderRecursive(curPath);
+			} else {
+				// Delete file
+				fs.unlinkSync(curPath);
+			}
+		});
+
+		// Delete the empty folder
+		fs.rmdirSync(folderPath);
+	}
+}
+
+module.exports = {
+	splitFiles,
+	renamePackagesSymbols
+}
 
