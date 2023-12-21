@@ -13,8 +13,11 @@
   "main": "./extension.js",
   "contributes": {
     "commands": [{
-      "command": "gopherjsre.helloWorld",
-      "title": "Hello World"
+      "command": "gopherjsre.decompileSingleFile",
+      "title": "GopherjsRE decompile each file"
+    },{
+      "command": "gopherjsre.splitfiles",
+      "title": "GopherjsRE split files"
     }]
   },
   "scripts": {
