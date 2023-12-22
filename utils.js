@@ -5,7 +5,7 @@ const vscode = require('vscode');
 
 
 
-function splitFiles(){
+function splitFiles() {
 	const active = vscode.window.activeTextEditor;
 	if (!active || !active.document) return;
 
@@ -46,45 +46,44 @@ function splitFiles(){
 
 
 // rename symbols such as:    A = $packages["fmt"];
-function renamePackagesSymbols(editor) {
-			// Get the entire document's text
-			const documentText = editor.document.getText();
+async function renamePackagesSymbols(editor) {
+	// Get the entire document's text
+	const documentText = editor.document.getText();
 
-			// Specify the regular expression pattern
-			const regexPattern = /(\w+)\s*=\s*\$packages\["([^"]+)"\];/g; // Replace with your regex pattern
-
-
-			// Find matches using the regular expression
-			const matches = documentText.matchAll(regexPattern);
+	// Specify the regular expression pattern
+	const regexPattern = /(\w+)\s*=\s*\$packages\["([^"]+)"\];/g; // Replace with your regex pattern
 
 
-			let counter = 0;
-			if (matches) {
-				// Loop through the matches and rename each symbol
-				for (const match of matches) {
-					counter += 1;
-
-					const positionInfo = editor.document.positionAt(match.index);
-
-					let finalName = match[2];
-
-					vscode.commands.executeCommand('vscode.executeDocumentRenameProvider',
-						vscode.window.activeTextEditor.document.uri,
-						positionInfo,
-						finalName).then(edit => {
-							if (!edit) {
-								return false;
-							}
-							return vscode.workspace.applyEdit(edit);
-						});
+	// Find matches using the regular expression
+	const matches = documentText.matchAll(regexPattern);
 
 
-				};
-				vscode.window.showInformationMessage(`Renamed ${counter} symbols`);
+	let counter = 0;
+	if (matches) {
+		// Loop through the matches and rename each symbol
+		for (const match of matches) {
+			counter += 1;
 
-			} else {
-				vscode.window.showInformationMessage('No matches found for the given regex pattern.');
-			}
+			const positionInfo = editor.document.positionAt(match.index);
+
+			let finalName = match[2];
+
+			let workspaceEdit = await vscode.commands.executeCommand('vscode.executeDocumentRenameProvider',
+				vscode.window.activeTextEditor.document.uri,
+				positionInfo,
+				finalName);
+
+			vscode.workspace.applyEdit(workspaceEdit);
+
+			
+
+
+		};
+		vscode.window.showInformationMessage(`Renamed ${counter} symbols`);
+
+	} else {
+		vscode.window.showInformationMessage('No matches found for the given regex pattern.');
+	}
 }
 
 
@@ -112,4 +111,3 @@ module.exports = {
 	splitFiles,
 	renamePackagesSymbols
 }
-
