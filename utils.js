@@ -76,13 +76,11 @@ async function renamePackagesSymbols(editor) {
 			vscode.workspace.applyEdit(workspaceEdit);
 
 			
-
-
 		};
-		vscode.window.showInformationMessage(`Renamed ${counter} symbols`);
+		vscode.window.showInformationMessage(`Renamed ${counter} package symbols`);
 
 	} else {
-		vscode.window.showInformationMessage('No matches found for the given regex pattern.');
+		vscode.window.showInformationMessage('No matches found for package symbols');
 	}
 }
 
