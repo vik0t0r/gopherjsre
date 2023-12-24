@@ -44,6 +44,9 @@ function activate(context) {
 
 							util.renamePublicFunction(editor).then(()=> {
 								console.log("finished renaming functions");
+								util.commentOutBoilerplate(editor).then(()=> {
+									console.log("finished commenting out boilerplate");
+								});
 							});
 						});
 					});

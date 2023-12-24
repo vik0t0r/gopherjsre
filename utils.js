@@ -300,10 +300,57 @@ async function renamePublicFunction(editor) {
 	}
 }
 
+async function commentOutBoilerplate(editor) {
+
+	const regexPattern = /if\s*\(\s*\$c\s*\)\s*{\s*\$c\s*=\s*false;\s*.+\s*=\s*.+\.\$blk\(\);\s*}\s*if\s*\(\s*.+\s*&&\s*.+\.\$blk\s*!==\s*undefined\s*\)\s*{\s*break\s*s;\s*}\s*.+\s*;/;
+
+
+	let documentText = editor.document.getText();
+	// we cannot count previous appearences to fix the offset, re run matcher from each point
+
+	// Find matches using the regular expression
+	let match = documentText.match(regexPattern);
+
+	let offset = 0;
+
+	let counter = 0;
+	while (match) {
+		counter += 1;
+
+		const startPositionInfo = editor.document.positionAt(match.index + offset);
+		const endPositionInfo = editor.document.positionAt(match.index + match[0].length + offset);
+
+		const editableRange = new vscode.Range(startPositionInfo, endPositionInfo);
+
+		let newText = "//" + convertToSingleLine(match[0]);
+
+		await editor.edit(editBuilder => {
+			editBuilder.replace(editableRange, newText);
+		});
+
+
+		offset += match.index + newText.length;
+		// find next ocurrence
+		documentText = editor.document.getText();
+		match = documentText.slice(offset).match(regexPattern);
+	};
+	vscode.window.showInformationMessage(`Removed ${counter} boilerplate`);
+
+	if (counter === 0) {
+		vscode.window.showInformationMessage('No boilerplate to remove found');
+	}
+}
+
+function convertToSingleLine(code) {
+	// Remove line breaks and extra whitespaces
+	return code.replace(/\s+/g, ' ').trim();
+  }
+
 module.exports = {
 	splitFiles,
 	renamePackagesSymbols,
 	renameNewTypeSymbols,
 	renameTypeSymbols,
-	renamePublicFunction
+	renamePublicFunction,
+	commentOutBoilerplate
 }
