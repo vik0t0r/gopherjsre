@@ -34,9 +34,15 @@ function activate(context) {
 			vscode.commands.executeCommand('compile-hero.beautify').then(() => {
 				// rename symbols such as:    A = $packages["fmt"];
 				util.renamePackagesSymbols(editor).then(()=> {
-					console.log("finished lol");
+					console.log("finished renaming packages");
 
 				});
+
+				//util.renameNewTypeSymbols(editor).then(()=> {
+				//	console.log("finished renaming newTypeSymbols");
+
+				
+			//});
 			});
 		} else {
 			vscode.window.showInformationMessage("Open the file to decompile");
