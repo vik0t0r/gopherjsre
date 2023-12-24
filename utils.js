@@ -100,45 +100,54 @@ async function renamePackagesSymbols(editor) {
 // rename symbols such as:    B = $pkg.person = $newType(0, $kindStruct, "main.person", true, "main", false, function (name_, age_) {
 async function renameNewTypeSymbols(editor) {
 	// Get the entire document's text
-	const documentText = editor.document.getText();
 
 	// Specify the regular expression pattern
-	const regexPattern = /(\w+)\s*=\s*(\w+).(\w+)\s*=\s*\$newType\("([^)]+)"\);/g;
+	const regexPattern = /(\w+)\s*=\s*\$pkg\.([^=\s]+)\s*=\s*\$newType/;
 
+	let documentText = editor.document.getText();
+	// we cannot count previous appearences to fix the offset, re run matcher from each point
 
 	// Find matches using the regular expression
-	const matches = documentText.matchAll(regexPattern);
+	let match = documentText.match(regexPattern);
 
+	let offset = 0;
 
 	let counter = 0;
-	if (matches) {
-		// Loop through the matches and rename each symbol
-		for (const match of matches) {
-			counter += 1;
+	while (match){
+		counter += 1;
+		//			console.log("Error: " + error);
+		//			console.log("Index: " + match.index);
 
-			const positionInfo = editor.document.positionAt(match.index);
+		//const positionInfo = editor.document.positionAt(match.index + offset);
+		//			console.log("Position to edit: l:" + positionInfo.line + " c: " + positionInfo.character);
 
-			let finalName = match[2];
-			finalName = finalName.replaceAll("/", "_");
-			finalName = finalName + "_" + match[1];
+		let finalName = match[2];
+		finalName = finalName.replaceAll("/", "_");
+		finalName = finalName.replaceAll(".", "");
+		finalName = finalName + "_" + match[1];
+		finalName = "type_" + finalName;
 
 
-			/*			let workspaceEdit = await vscode.commands.executeCommand('vscode.executeDocumentRenameProvider',
-							vscode.window.activeTextEditor.document.uri,
-							positionInfo,
-							finalName);
 
-						vscode.workspace.applyEdit(workspaceEdit);
-			*/
+		let workspaceEdit = await vscode.commands.executeCommand('vscode.executeDocumentRenameProvider',
+			vscode.window.activeTextEditor.document.uri,
+			positionInfo,
+			finalName);
 
-		};
-		vscode.window.showInformationMessage(`Renamed ${counter} package symbols`);
+		await vscode.workspace.applyEdit(workspaceEdit);
 
-	} else {
-		vscode.window.showInformationMessage('No matches found for package symbols');
+		offset += match.index + match[0].length + finalName.length;
+
+		// find next ocurrence
+		documentText = editor.document.getText();
+		match = documentText.slice(offset).match(regexPattern);
+	};
+	vscode.window.showInformationMessage(`Renamed ${counter} newType symbols`);
+
+	if (counter === 0) {
+		vscode.window.showInformationMessage('No matches found for newType symbols');
 	}
 }
-
 
 
 function deleteFolderRecursive(folderPath) {

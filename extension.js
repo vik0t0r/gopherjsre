@@ -36,13 +36,13 @@ function activate(context) {
 				util.renamePackagesSymbols(editor).then(()=> {
 					console.log("finished renaming packages");
 
+					util.renameNewTypeSymbols(editor).then(()=> {
+						console.log("finished renaming newTypeSymbols");
+					});
 				});
 
-				//util.renameNewTypeSymbols(editor).then(()=> {
-				//	console.log("finished renaming newTypeSymbols");
 
-				
-			//});
+
 			});
 		} else {
 			vscode.window.showInformationMessage("Open the file to decompile");
