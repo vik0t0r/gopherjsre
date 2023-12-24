@@ -186,7 +186,7 @@ async function renameTypeSymbols(editor) {
 		//			console.log("Index: " + match.index);
 
 		const positionInfo = editor.document.positionAt(match.index + offset);
-					// console.log("Position to edit: l:" + positionInfo.line + " c: " + positionInfo.character);
+		// console.log("Position to edit: l:" + positionInfo.line + " c: " + positionInfo.character);
 		switch (match[2]) {
 			case "arrayType":
 				finalName = "t_Array" + match[3].split(",")[0] + "_" + match[3].split(",")[1] + "_" + match[1];
@@ -255,50 +255,50 @@ function deleteFolderRecursive(folderPath) {
 
 
 // rename symbols such as:    $pkg.println = D, D being a function
-	async function renamePublicFunction(editor) {
-		// Get the entire document's text
+async function renamePublicFunction(editor) {
+	// Get the entire document's text
 
-		const regexPattern = /\$pkg\.([a-zA-Z_]\w*)\s*=\s*([^\s,;\$]+);/;
-	
-		let documentText = editor.document.getText();
-		// we cannot count previous appearences to fix the offset, re run matcher from each point
-	
-		// Find matches using the regular expression
-		let match = documentText.match(regexPattern);
-	
-		let offset = 0;
-	
-		let counter = 0;
-		while (match) {
-			counter += 1;
-			//			console.log("Error: " + error);
-			//			console.log("Index: " + match.index);
-	
-			const positionInfo = editor.document.positionAt(match.index + offset + (match[0].length - 2));
-			//			console.log("Position to edit: l:" + positionInfo.line + " c: " + positionInfo.character);
-	
-			let finalName = match[1] + "_" + match[2];
-	
-	
-			 let workspaceEdit = await vscode.commands.executeCommand('vscode.executeDocumentRenameProvider',
-			 	vscode.window.activeTextEditor.document.uri,
-			 	positionInfo,
-			 	finalName);
-	
-			 await vscode.workspace.applyEdit(workspaceEdit);
-	
-			offset += match.index + match[0].length + finalName.length;
-	
-			// find next ocurrence
-			documentText = editor.document.getText();
-			match = documentText.slice(offset).match(regexPattern);
-		};
-		vscode.window.showInformationMessage(`Renamed ${counter} public functions`);
-	
-		if (counter === 0) {
-			vscode.window.showInformationMessage('No matches found for public functions');
-		}
+	const regexPattern = /\$pkg\.([a-zA-Z_]\w*)\s*=\s*([^\s,;\$]+);/;
+
+	let documentText = editor.document.getText();
+	// we cannot count previous appearences to fix the offset, re run matcher from each point
+
+	// Find matches using the regular expression
+	let match = documentText.match(regexPattern);
+
+	let offset = 0;
+
+	let counter = 0;
+	while (match) {
+		counter += 1;
+		//			console.log("Error: " + error);
+		//			console.log("Index: " + match.index);
+
+		const positionInfo = editor.document.positionAt(match.index + offset + (match[0].length - 2));
+		//			console.log("Position to edit: l:" + positionInfo.line + " c: " + positionInfo.character);
+
+		let finalName = match[1] + "_" + match[2];
+
+
+		let workspaceEdit = await vscode.commands.executeCommand('vscode.executeDocumentRenameProvider',
+			vscode.window.activeTextEditor.document.uri,
+			positionInfo,
+			finalName);
+
+		await vscode.workspace.applyEdit(workspaceEdit);
+
+		offset += match.index + match[0].length + finalName.length;
+
+		// find next ocurrence
+		documentText = editor.document.getText();
+		match = documentText.slice(offset).match(regexPattern);
+	};
+	vscode.window.showInformationMessage(`Renamed ${counter} public functions`);
+
+	if (counter === 0) {
+		vscode.window.showInformationMessage('No matches found for public functions');
 	}
+}
 
 module.exports = {
 	splitFiles,
