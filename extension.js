@@ -41,6 +41,10 @@ function activate(context) {
 
 						util.renameTypeSymbols(editor).then(()=> {
 							console.log("finished renaming other type symbols");
+
+							util.renamePublicFunction(editor).then(()=> {
+								console.log("finished renaming functions");
+							});
 						});
 					});
 				});
