@@ -28,6 +28,7 @@ function splitFiles() {
 		// genereate path
 		let filePath = lineString.slice(initNameIndex, lastNameIndex);
 		filePath = filePath.replaceAll("/", "_");
+
 		filePath = filePath + ".js";
 		filePath = outputDir + filePath;
 
@@ -72,6 +73,7 @@ async function renamePackagesSymbols(editor) {
 
 			let finalName = match[2];
 			finalName = finalName.replaceAll("/", "_");
+			finalName = finalName.replaceAll(".", "");
 			finalName = finalName + "_" + match[1];
 
 			// number of characters appended to the file
