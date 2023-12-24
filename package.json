@@ -37,5 +37,6 @@
   "dependencies": {
     "fs": "^0.0.1-security",
     "path": "^0.12.7"
-  }
+  },
+  "repository":"https://github.com/vik0t0r/gopherjsre"
 }
