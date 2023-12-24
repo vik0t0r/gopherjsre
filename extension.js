@@ -20,7 +20,7 @@ function activate(context) {
 
 		console.log('Splitting files');
 		util.splitFiles();
-		vscode.showInformationMessage("Files splitted");
+		vscode.window.showInformationMessage("Files splitted");
 
 	});
 	context.subscriptions.push(disposable);
@@ -47,7 +47,7 @@ function activate(context) {
 								console.log("finished renaming functions");
 								util.commentOutBoilerplate(editor).then(()=> {
 									console.log("finished commenting out boilerplate");
-									vscode.showInformationMessage("File cleaned");
+									vscode.window.showInformationMessage("File cleaned");
 								});
 							});
 						});
