@@ -89,10 +89,10 @@ async function renamePackagesSymbols(editor) {
 
 
 		};
-		vscode.window.showInformationMessage(`Renamed ${counter} package symbols`);
+		console.log(`Renamed ${counter} package symbols`);
 
 	} else {
-		vscode.window.showInformationMessage('No matches found for package symbols');
+		console.log('No matches found for package symbols');
 	}
 }
 
@@ -142,10 +142,10 @@ async function renameNewTypeSymbols(editor) {
 		documentText = editor.document.getText();
 		match = documentText.slice(offset).match(regexPattern);
 	};
-	vscode.window.showInformationMessage(`Renamed ${counter} newType symbols`);
+	console.log(`Renamed ${counter} newType symbols`);
 
 	if (counter === 0) {
-		vscode.window.showInformationMessage('No matches found for newType symbols');
+		console.log('No matches found for newType symbols');
 	}
 }
 
@@ -222,10 +222,10 @@ async function renameTypeSymbols(editor) {
 		documentText = editor.document.getText();
 		match = documentText.slice(offset).match(regexPattern);
 	};
-	vscode.window.showInformationMessage(`Renamed ${counter} builtin type symbols`);
+	console.log(`Renamed ${counter} builtin type symbols`);
 
 	if (counter === 0) {
-		vscode.window.showInformationMessage('No matches found for builtin type symbols');
+		console.log('No matches found for builtin type symbols');
 	}
 }
 
@@ -293,10 +293,10 @@ async function renamePublicFunction(editor) {
 		documentText = editor.document.getText();
 		match = documentText.slice(offset).match(regexPattern);
 	};
-	vscode.window.showInformationMessage(`Renamed ${counter} public functions`);
+	console.log(`Renamed ${counter} public functions`);
 
 	if (counter === 0) {
-		vscode.window.showInformationMessage('No matches found for public functions');
+		console.log('No matches found for public functions');
 	}
 }
 
@@ -334,10 +334,10 @@ async function commentOutBoilerplate(editor) {
 		documentText = editor.document.getText();
 		match = documentText.slice(offset).match(regexPattern);
 	};
-	vscode.window.showInformationMessage(`Removed ${counter} boilerplate`);
+	console.log(`Removed ${counter} boilerplate`);
 
 	if (counter === 0) {
-		vscode.window.showInformationMessage('No boilerplate to remove found');
+		console.log('No boilerplate to remove found');
 	}
 }
 
