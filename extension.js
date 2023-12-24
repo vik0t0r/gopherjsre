@@ -38,6 +38,10 @@ function activate(context) {
 
 					util.renameNewTypeSymbols(editor).then(()=> {
 						console.log("finished renaming newTypeSymbols");
+
+						util.renameTypeSymbols(editor).then(()=> {
+							console.log("finished renaming other type symbols");
+						});
 					});
 				});
 

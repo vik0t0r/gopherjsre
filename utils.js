@@ -113,12 +113,12 @@ async function renameNewTypeSymbols(editor) {
 	let offset = 0;
 
 	let counter = 0;
-	while (match){
+	while (match) {
 		counter += 1;
 		//			console.log("Error: " + error);
 		//			console.log("Index: " + match.index);
 
-		//const positionInfo = editor.document.positionAt(match.index + offset);
+		const positionInfo = editor.document.positionAt(match.index + offset);
 		//			console.log("Position to edit: l:" + positionInfo.line + " c: " + positionInfo.character);
 
 		let finalName = match[2];
@@ -149,6 +149,90 @@ async function renameNewTypeSymbols(editor) {
 	}
 }
 
+// rename symbols such as:    B = $pkg.person = $newType(0, $kindStruct, "main.person", true, "main", false, function (name_, age_) {
+// BK = $arrayType($Uint16, 2);
+// BL = $sliceType(BK);
+// BM = $sliceType($emptyInterface);
+// BN = $ptrType(reflect_E.rtype);
+// BO = $ptrType(type_buffer_AO);
+// BP = $arrayType($Uint8, 68);
+// BS = $sliceType($Uint8);
+// BT = $ptrType(type_ss_W);
+// CO = $ptrType(type_pp_AP);
+// CP = $arrayType($Uint8, 6);
+// CQ = $funcType([$Int32], [$Bool], false);
+// CS = $ptrType(type_fmt_BH);
+
+// be aware that BK has to be renamed before BL so the types names make sense
+
+async function renameTypeSymbols(editor) {
+	// this regex matches any of the previous lines, than god chatgpt
+	const regexPattern = /(\w+) = \$(ptrType|arrayType|sliceType|funcType)\((.+)\);/;
+
+
+	let documentText = editor.document.getText();
+	// we cannot count previous appearences to fix the offset, re run matcher from each point
+
+	// Find matches using the regular expression
+	let match = documentText.match(regexPattern);
+
+	let offset = 0;
+	let finalName = "";
+
+	let counter = 0;
+	while (match) {
+		counter += 1;
+		//			console.log("Error: " + error);
+		//			console.log("Index: " + match.index);
+
+		const positionInfo = editor.document.positionAt(match.index + offset);
+					console.log("Position to edit: l:" + positionInfo.line + " c: " + positionInfo.character);
+		switch (match[2]) {
+			case "arrayType":
+				finalName = "t_Array" + match[3].split(",")[0] + "_" + match[3].split(",")[1] + "_" + match[1];
+				break;
+			case "sliceType":
+				finalName = "t_Slice" + capitalizeFirstLetter(match[3]) + "_" + match[1];
+				break;
+			case "funcType":
+				finalName = "t_Func_" + match[1];
+				break;
+			case "ptrType":
+				finalName = "t_Ptr" + capitalizeFirstLetter(match[3]) + "_" + match[1];
+				break
+
+		}
+
+		finalName = finalName.replaceAll(/\s/g, '');
+		finalName = finalName.replaceAll(".", "");
+
+
+
+		let workspaceEdit = await vscode.commands.executeCommand('vscode.executeDocumentRenameProvider',
+			vscode.window.activeTextEditor.document.uri,
+			positionInfo,
+			finalName);
+
+		await vscode.workspace.applyEdit(workspaceEdit);
+
+		// the offset calculation is bugged, as it doesnt take into account how many times does the type appear previously, which can make some types to be processed twice and others to not be processed.
+		offset += match.index + match[0].length + finalName.length;
+
+		// find next ocurrence
+		documentText = editor.document.getText();
+		match = documentText.slice(offset).match(regexPattern);
+	};
+	vscode.window.showInformationMessage(`Renamed ${counter} builtin type symbols`);
+
+	if (counter === 0) {
+		vscode.window.showInformationMessage('No matches found for builtin type symbols');
+	}
+}
+
+function capitalizeFirstLetter(string) {
+	return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 
 function deleteFolderRecursive(folderPath) {
 	if (fs.existsSync(folderPath)) {
@@ -172,5 +256,6 @@ function deleteFolderRecursive(folderPath) {
 module.exports = {
 	splitFiles,
 	renamePackagesSymbols,
-	renameNewTypeSymbols
+	renameNewTypeSymbols,
+	renameTypeSymbols
 }
