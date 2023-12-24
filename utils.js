@@ -73,6 +73,7 @@ async function renamePackagesSymbols(editor) {
 
 			let finalName = match[2];
 			finalName = finalName.replaceAll("/", "_");
+			finalName = finalName.replaceAll("-", "_");
 			finalName = finalName.replaceAll(".", "");
 			finalName = finalName + "_" + match[1];
 
@@ -302,7 +303,7 @@ async function renamePublicFunction(editor) {
 
 async function commentOutBoilerplate(editor) {
 
-	const regexPattern = /if\s*\(\s*\$c\s*\)\s*{\s*\$c\s*=\s*false;\s*.+\s*=\s*.+\.\$blk\(\);\s*}\s*if\s*\(\s*.+\s*&&\s*.+\.\$blk\s*!==\s*undefined\s*\)\s*{\s*break\s*s;\s*}\s*.+\s*;/;
+	const regexPattern = /if\s*\(\s*\$c\s*\)\s*{\s*\$c\s*=\s*false;\s*.+\s*=\s*.+\.\$blk\(\);\s*}\s*if\s*\(\s*.+\s*&&\s*.+\.\$blk\s*!==\s*undefined\s*\)\s*{\s*break\s*s;\s*}/;
 
 
 	let documentText = editor.document.getText();
